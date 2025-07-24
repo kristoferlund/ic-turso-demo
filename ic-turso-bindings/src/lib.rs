@@ -88,7 +88,7 @@ impl Builder {
         let io: Arc<dyn turso_core::IO> = Arc::new(StableIO::new(self.virtual_memory));
         let file = io.open_file(path, OpenFlags::Create, false).unwrap();
         let db_file = Arc::new(StableDatabaseStorage::new(file));
-        let db = turso_core::Database::open(io, path, db_file, false, false).unwrap();
+        let db = turso_core::Database::open(io, path, db_file, false, true).unwrap();
         Ok(Database { inner: db })
     }
 }
