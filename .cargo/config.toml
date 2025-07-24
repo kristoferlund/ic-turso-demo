@@ -1,3 +1,5 @@
-# It's recommended to set the flag on a per-target basis:
+[build]
+target = "wasm32-unknown-unknown"
+
 [target.wasm32-unknown-unknown]
 rustflags = ['--cfg', 'getrandom_backend="custom"']
