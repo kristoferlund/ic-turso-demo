@@ -1,6 +1,5 @@
-use candid::Principal;
 use getrandom_v03::Error;
-use ic_cdk::{call::Call, init, management_canister, post_upgrade};
+use ic_cdk::{init, management_canister, post_upgrade};
 use ic_cdk_timers::set_timer;
 use ic_stable_structures::{
     memory_manager::{MemoryId, MemoryManager},
@@ -17,17 +16,6 @@ thread_local! {
          RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
 }
 
-// async fn open_database() {
-//     let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(MOUNTED_MEMORY_ID)));
-//
-//     let db = Builder::with_memory(memory).build().await.unwrap();
-//     let conn = db.connect().unwrap();
-//
-//     CONNECTION.with_borrow_mut(|c| {
-//         *c = Some(conn);
-//     });
-// }
-
 fn vec_to_array32(vec: Vec<u8>) -> Option<[u8; 32]> {
     if vec.len() == 32 {
         let mut array = [0u8; 32];
@@ -41,13 +29,10 @@ fn vec_to_array32(vec: Vec<u8>) -> Option<[u8; 32]> {
 fn init_timer() {
     set_timer(Duration::ZERO, || {
         ic_cdk::futures::spawn(async {
-            ic_cdk::println!("1");
             let seed = management_canister::raw_rand().await.unwrap();
-            ic_cdk::println!("setting up");
             RNG.with_borrow_mut(|rng| {
                 *rng = Some(StdRng::from_seed(vec_to_array32(seed).unwrap()))
             });
-            ic_cdk::println!("3");
         })
     });
 }
@@ -92,20 +77,19 @@ async fn greet(name: String) -> String {
     conn.execute("CREATE TABLE IF NOT EXISTS users (name TEXT)", ())
         .await
         .unwrap();
-    //
-    // conn.execute("INSERT INTO users (name) VALUES (?1)", [name.clone()])
-    //     .await
-    //     .unwrap();
 
-    // let mut stmt = conn
-    //     .prepare("SELECT * FROM users WHERE name = ?1")
-    //     .await
-    //     .unwrap();
-    //
-    // let mut rows = stmt.query([name.clone()]).await.unwrap();
-    // let row = rows.next().await.unwrap().unwrap();
-    // let value = row.get_value(0).unwrap();
-    //
-    // format!("Hello {}", value.as_text().unwrap())
-    "Hej".to_string()
+    conn.execute("INSERT INTO users (name) VALUES (?1)", [name.clone()])
+        .await
+        .unwrap();
+
+    let mut stmt = conn
+        .prepare("SELECT * FROM users WHERE name = ?1")
+        .await
+        .unwrap();
+
+    let mut rows = stmt.query([name.clone()]).await.unwrap();
+    let row = rows.next().await.unwrap().unwrap();
+    let value = row.get_value(0).unwrap();
+
+    format!("Hello {}", value.as_text().unwrap())
 }

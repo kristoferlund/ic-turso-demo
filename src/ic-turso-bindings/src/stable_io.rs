@@ -134,21 +134,6 @@ impl File for StableFile {
         Ok(Arc::new(c))
     }
 
-    // fn pwrite(
-    //     &self,
-    //     pos: usize,
-    //     buffer: Arc<RefCell<Buffer>>,
-    //     c: Completion,
-    // ) -> Result<Arc<Completion>> {
-    //     ic_cdk::println!("pwrite pos: {}", pos);
-    //     let buf = buffer.borrow();
-    //     let buf = buf.as_slice();
-    //     self.virtual_memory.write(pos as u64, buf);
-    //     c.complete(buffer.borrow().len() as i32);
-    //     #[allow(clippy::arc_with_non_send_sync)]
-    //     Ok(Arc::new(c))
-    // }
-
     fn pwrite(
         &self,
         pos: usize,
@@ -171,9 +156,11 @@ impl File for StableFile {
 
             if pages_to_grow > 0 {
                 let grown = self.virtual_memory.grow(pages_to_grow);
-                // if grown == -1 {
-                //     return Err(turso_core::LimboError::Io);
-                // }
+                if grown == -1 {
+                    return Err(turso_core::LimboError::InternalError(
+                        "Could not grow memory.".to_string(),
+                    ));
+                }
             }
         }
 
