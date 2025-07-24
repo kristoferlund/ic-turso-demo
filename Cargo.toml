@@ -1,3 +1,6 @@
 [workspace]
 members = ["src/backend", "src/ic-turso-bindings"]
 resolver = "2"
+
+[patch.crates-io]
+turso_sqlite3_parser = { path = "patches/sqlite3-parser" }

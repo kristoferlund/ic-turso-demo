@@ -15,5 +15,6 @@ ic-cdk = "0.18.5"
 ic-stable-structures = "0.7.0"
 getrandom = { version = "0.2.16", features = ["custom"] }
 turso_core = { version = "0.1.2", default-features = false }
+turso_sqlite3_parser = { version = "0.1.2", default-features = false }
 thiserror = "2.0.9"
 tracing = "0.1.41"
