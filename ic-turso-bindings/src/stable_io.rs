@@ -121,7 +121,6 @@ impl File for StableFile {
     }
 
     fn pread(&self, pos: usize, c: Completion) -> Result<Arc<Completion>> {
-        ic_cdk::println!("pread pos: {}", pos);
         let nr = {
             let r = c.as_read();
             let mut buf = r.buf_mut();
@@ -140,8 +139,6 @@ impl File for StableFile {
         buffer: Arc<RefCell<Buffer>>,
         c: Completion,
     ) -> Result<Arc<Completion>> {
-        ic_cdk::println!("pwrite pos: {}", pos);
-
         let buf = buffer.borrow();
         let buf = buf.as_slice();
 
