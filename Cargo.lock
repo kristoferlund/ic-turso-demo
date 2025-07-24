@@ -1615,8 +1615,6 @@ dependencies = [
 [[package]]
 name = "turso_sqlite3_parser"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee9b7c2e6ed471cac8d82e59f53f90710e1ad45f4f07a3bd99bded204fcf938b"
 dependencies = [
  "bitflags",
  "cc",

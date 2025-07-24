@@ -14,7 +14,7 @@ use indexmap::{IndexMap, IndexSet};
 
 use crate::custom_err;
 use crate::dialect::TokenType::{self, *};
-use crate::dialect::{from_token, Token};
+use crate::dialect::{from_token, is_identifier, Token};
 use crate::parser::{parse::YYCODETYPE, ParserError};
 
 /// `?` or `$` Prepared statement arg placeholder(s)
@@ -896,8 +896,7 @@ pub struct FromClause {
     pub select: Option<Box<SelectTable>>, // FIXME mandatory
     /// `JOIN`ed tabled
     pub joins: Option<Vec<JoinedSelectTable>>,
-    /// A default join operator
-    pub op: Option<JoinOperator>, // FIXME transient
+    op: Option<JoinOperator>, // FIXME transient
 }
 impl FromClause {
     pub(crate) fn empty() -> Self {
@@ -1743,14 +1742,10 @@ pub type PragmaValue = Expr; // TODO
 #[strum(serialize_all = "snake_case")]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PragmaName {
-    /// Returns the application ID of the database file.
-    ApplicationId,
     /// set the autovacuum mode
     AutoVacuum,
     /// `cache_size` pragma
     CacheSize,
-    /// List databases
-    DatabaseList,
     /// Run integrity check on the database file
     IntegrityCheck,
     /// `journal_mode` pragma

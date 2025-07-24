@@ -215,7 +215,7 @@ impl<'input> yyParser<'input> {
 
         // TODO: The compiler optimizes `std::mem::take` to two `memcpy` 
         // but `yyStackEntry` requires 168 bytes, so it is not worth it (maybe).
-        // assert_eq!(std::mem::size_of::<yyStackEntry>(), 168);
+        assert_eq!(std::mem::size_of::<yyStackEntry>(), 168);
         std::mem::take(&mut self.yystack[idx])
     }
 
