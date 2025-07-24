@@ -1,0 +1,19 @@
+# Copyright 2025 the Turso authors. All rights reserved. MIT license.
+
+[package]
+name = "ic-turso-bindings"
+version = "0.0.0"
+edition = "2021"
+
+[features]
+default = []
+experimental_indexes = []
+antithesis = ["turso_core/antithesis"]
+
+[dependencies]
+ic-cdk = "0.18.5"
+ic-stable-structures = "0.7.0"
+getrandom = { version = "0.2.16", features = ["custom"] }
+turso_core = { version = "0.1.2", default-features = false }
+thiserror = "2.0.9"
+tracing = "0.1.41"

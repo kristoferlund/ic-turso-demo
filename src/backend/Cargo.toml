@@ -1,0 +1,25 @@
+[package]
+name = "backend"
+version = "0.0.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.10"
+getrandom = { version = "0.2.16", features = ["custom"] }
+getrandom_v03 = { package = "getrandom", version = "0.3" }
+hex = "0.4.3"
+serde = "1.0.164"
+serde_json = "1.0.97"
+ic-cdk = "0.18.5"
+ic-stable-structures = "0.7.0"
+ic-cdk-timers = "0.12.2"
+rand = { version = "0.9.2", features = ["os_rng"] }
+ic-turso-bindings = { path = "../ic-turso-bindings", features = [
+  "experimental_indexes",
+] }
+uuid = { version = "1.17.0", features = ["rng-getrandom"] }
