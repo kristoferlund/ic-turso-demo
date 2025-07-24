@@ -1,23 +1,11 @@
 {
   "canisters": {
-    "backend": {
-      "candid": "src/backend/backend.did",
-      "package": "backend",
+    "ic-turso-demo": {
+      "candid": "ic-turso-demo/ic-turso-demo.did",
+      "package": "ic-turso-demo",
       "type": "rust",
       "declarations": {
-        "output": "src/backend/declarations"
-      }
-    },
-    "frontend": {
-      "dependencies": [
-        "backend"
-      ],
-      "source": [
-        "src/frontend/dist"
-      ],
-      "type": "assets",
-      "declarations": {
-        "output": "src/frontend/declarations"
+        "output": "ic-turso-demo/declarations"
       }
     }
   },

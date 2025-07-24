@@ -16,22 +16,12 @@ thread_local! {
          RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
 }
 
-fn vec_to_array32(vec: Vec<u8>) -> Option<[u8; 32]> {
-    if vec.len() == 32 {
-        let mut array = [0u8; 32];
-        array.copy_from_slice(&vec);
-        Some(array)
-    } else {
-        None
-    }
-}
-
 fn init_timer() {
     set_timer(Duration::ZERO, || {
         ic_cdk::futures::spawn(async {
             let seed = management_canister::raw_rand().await.unwrap();
             RNG.with_borrow_mut(|rng| {
-                *rng = Some(StdRng::from_seed(vec_to_array32(seed).unwrap()))
+                *rng = Some(StdRng::from_seed(seed.try_into().unwrap()));
             });
         })
     });
@@ -45,27 +35,6 @@ fn init() {
 #[post_upgrade]
 fn post_upgrade() {
     init_timer();
-}
-
-#[no_mangle]
-unsafe extern "Rust" fn __getrandom_v03_custom(dest: *mut u8, len: usize) -> Result<(), Error> {
-    RNG.with_borrow_mut(|rng| match rng {
-        None => Err(Error::new_custom(0)),
-        Some(rng) => {
-            let buf: &mut [u8] = unsafe {
-                core::ptr::write_bytes(dest, 0, len);
-                core::slice::from_raw_parts_mut(dest, len)
-            };
-            rng.fill_bytes(buf);
-            Ok(())
-        }
-    })
-}
-
-getrandom::register_custom_getrandom!(custom_getrandom);
-fn custom_getrandom(buf: &mut [u8]) -> Result<(), getrandom::Error> {
-    RNG.with(|rng| rng.borrow_mut().as_mut().unwrap().fill_bytes(buf));
-    Ok(())
 }
 
 #[ic_cdk::query]
@@ -92,4 +61,25 @@ async fn greet(name: String) -> String {
     let value = row.get_value(0).unwrap();
 
     format!("Hello {}", value.as_text().unwrap())
+}
+
+#[no_mangle]
+unsafe extern "Rust" fn __getrandom_v03_custom(dest: *mut u8, len: usize) -> Result<(), Error> {
+    RNG.with_borrow_mut(|rng| match rng {
+        None => Err(Error::new_custom(0)),
+        Some(rng) => {
+            let buf: &mut [u8] = unsafe {
+                core::ptr::write_bytes(dest, 0, len);
+                core::slice::from_raw_parts_mut(dest, len)
+            };
+            rng.fill_bytes(buf);
+            Ok(())
+        }
+    })
+}
+
+getrandom::register_custom_getrandom!(custom_getrandom);
+fn custom_getrandom(buf: &mut [u8]) -> Result<(), getrandom::Error> {
+    RNG.with(|rng| rng.borrow_mut().as_mut().unwrap().fill_bytes(buf));
+    Ok(())
 }

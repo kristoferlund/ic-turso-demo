@@ -1,8 +1,6 @@
-# Copyright 2025 the Turso authors. All rights reserved. MIT license.
-
 [package]
 name = "ic-turso-bindings"
-version = "0.0.0"
+version = "0.0.1"
 edition = "2021"
 
 [features]
