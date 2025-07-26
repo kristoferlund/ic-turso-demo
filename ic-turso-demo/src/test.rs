@@ -1,6 +1,6 @@
 use crate::MEMORY_MANAGER;
 use ic_stable_structures::memory_manager::MemoryId;
-use ic_turso_bindings::{Builder, Connection};
+use ic_turso_bindings::{params, Builder, Connection};
 use std::rc::Rc;
 
 #[ic_cdk::query]
@@ -11,6 +11,7 @@ async fn test(name: String) -> String {
 
     test_create_users_table(&conn).await;
     test_insert_sample_users(&conn, &name).await;
+    test_select_first_user(&conn).await;
     test_create_logins_table(&conn).await;
     test_insert_logins(&conn, &name).await;
     test_create_messages_table(&conn).await;
@@ -29,20 +30,45 @@ async fn test(name: String) -> String {
 }
 
 async fn test_create_users_table(conn: &Connection) {
-    conn.execute("CREATE TABLE IF NOT EXISTS users (name TEXT)", ())
-        .await
-        .unwrap();
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS users (
+            name TEXT,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP
+        )",
+        (),
+    )
+    .await
+    .unwrap();
     ic_cdk::println!("Created 'users' table");
 }
 
 async fn test_insert_sample_users(conn: &Connection, name: &str) {
     for i in 0..100 {
         let user = format!("{}_{}", name, i);
-        conn.execute("INSERT INTO users (name) VALUES (?1)", [user])
+        conn.execute("INSERT INTO users (name) VALUES (?1)", params!(user))
             .await
             .unwrap();
     }
     ic_cdk::println!("Inserted 100 users");
+}
+
+async fn test_select_first_user(conn: &Connection) {
+    let mut stmt = conn
+        .prepare("SELECT name, created FROM users ORDER BY rowid ASC LIMIT 1")
+        .await
+        .unwrap();
+
+    let mut rows = stmt.query(()).await.unwrap();
+
+    if let Some(row) = rows.next().await.unwrap() {
+        let name_val = row.get_value(0).unwrap();
+        let created_val = row.get_value(1).unwrap();
+        let name = name_val.as_text().unwrap();
+        let created = created_val.as_text().unwrap();
+        ic_cdk::println!("First user: name = {}, created = {}", name, created);
+    } else {
+        ic_cdk::println!("No users found");
+    }
 }
 
 async fn test_create_logins_table(conn: &Connection) {
