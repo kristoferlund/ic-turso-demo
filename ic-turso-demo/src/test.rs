@@ -21,7 +21,7 @@ async fn test(name: String) -> String {
     test_select_user_by_name(&conn, &name).await;
     test_select_messages_by_user(&conn, &name).await;
     test_bulk_insert_data(&conn).await;
-    // test_create_index_on_users(&conn).await;
+    test_create_index_on_users(&conn).await;
     test_delete_random_users(&conn).await;
     test_update_usernames(&conn).await;
     test_cleanup(&conn).await;
@@ -31,10 +31,12 @@ async fn test(name: String) -> String {
 
 async fn test_create_users_table(conn: &Connection) {
     conn.execute(
-        "CREATE TABLE IF NOT EXISTS users (
+        r#"
+        CREATE TABLE IF NOT EXISTS users (
             name TEXT,
             created DATETIME DEFAULT CURRENT_TIMESTAMP
-        )",
+        )
+        "#,
         (),
     )
     .await
