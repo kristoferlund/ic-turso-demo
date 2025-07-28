@@ -39,9 +39,9 @@ pub async fn init_db() -> Rc<Connection> {
     connection
 }
 
-pub async fn connect_db() -> Rc<Connection> {
-    if let Some(conn) = CONNECTION.with_borrow(|c| c.as_ref().map(Rc::clone)) {
-        conn
+pub async fn get_connection() -> Rc<Connection> {
+    if let Some(conn) = CONNECTION.with_borrow(|c| c.clone()) {
+        Rc::clone(&conn)
     } else {
         init_db().await
     }

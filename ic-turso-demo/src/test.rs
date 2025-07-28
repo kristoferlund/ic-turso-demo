@@ -1,13 +1,9 @@
-use crate::MEMORY_MANAGER;
-use ic_stable_structures::memory_manager::MemoryId;
-use ic_turso_bindings::{params, Builder, Connection};
-use std::rc::Rc;
+use crate::get_connection;
+use ic_turso_bindings::{params, Connection};
 
-#[ic_cdk::query]
+#[ic_cdk::update]
 async fn test(name: String) -> String {
-    let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(1)));
-    let db = Builder::with_memory(memory).build().await.unwrap();
-    let conn = Rc::new(db.connect().unwrap());
+    let conn = get_connection().await;
 
     test_create_users_table(&conn).await;
     test_insert_sample_users(&conn, &name).await;
